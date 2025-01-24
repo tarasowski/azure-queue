@@ -15,7 +15,7 @@ async function listQueues() {
   }
 }
 
-listQueues()
+//listQueues()
 
 async function addToQ(queueName, messageText) {
  const queueClient = queueServiceClient.getQueueClient(queueName)
@@ -23,5 +23,23 @@ async function addToQ(queueName, messageText) {
  console.log(`Sent message: ${messageText}, Message ID: ${sendMessageResponse.messageId}`);
 }
 
+//addToQ("amazonorderservice", "Hey! Die Nachricht ist von Dimi")
 
-addToQ("amazonorderservice", "Hey! Die Nachricht ist von Dimi")
+async function processMessage(queueName) {
+  const queueClient = queueServiceClient.getQueueClient(queueName);
+  const response = await queueClient.receiveMessages();
+  if (response.receivedMessageItems.length === 1) {
+    const receivedMessageItem = response.receivedMessageItems[0];
+    console.log(`Processing & deleting message with content: ${receivedMessageItem.messageText}`);
+    const deleteMessageResponse = await queueClient.deleteMessage(
+      receivedMessageItem.messageId,
+      receivedMessageItem.popReceipt
+    );
+    console.log(
+      `Delete message successfully, service assigned request Id: ${deleteMessageResponse.requestId}`
+    );
+  }
+}
+
+//processMessage("amazonorderservice")
+
